@@ -1,4 +1,4 @@
-import { createContext,useState } from "react";
+import { createContext,useEffect,useState } from "react";
 
 export const AppContext = createContext({})
 
@@ -8,7 +8,7 @@ export const AppContextProvider = ({children})=>{
    const [newData ,setNewData] = useState(null)
    const [ addNewTodo ,setAddNewTodo] = useState(false)
    const [open, setOpen] = useState({active:false,name:"",address:"",start:"",end:"",nbr:"",img:"",id:""});
-
+   const [cardId ,setCardId] = useState(null)
 
    const hndleDeleteAPi = (id) => {
     let val = JSON.parse(localStorage.getItem('data'));
@@ -34,14 +34,14 @@ export const AppContextProvider = ({children})=>{
 
 
 
-
     return (
         <AppContext.Provider 
         value={{
             newData ,setNewData,
             addNewTodo ,setAddNewTodo,
             hndleDeleteAPi,
-            open, setOpen
+            open, setOpen,
+            cardId ,setCardId
         }}
         >
               {children}

@@ -5,6 +5,7 @@ import TimeLine from '../components/TimeLine';
 import SideBar from '../components/SideBar';
 import { AppContext } from '../context/CreateContext';
 import ShowData from '../components/ShowData';
+import { Link } from 'react-router-dom';
 
 
 const Home = () => {
@@ -13,18 +14,18 @@ const Home = () => {
 
   const [items, setItems] = useState([]);
   const [groups, setGroups] = useState({});
-  const { newData, setOpen} = useContext(AppContext)
+  const { newData, setOpen } = useContext(AppContext)
   useEffect(() => {
     if (newData) {
       localStorage.setItem('data', JSON.stringify(newData));
     }
-    const DATA = JSON.parse(localStorage.getItem("data"))
+    const DATA = JSON.parse(localStorage.getItem("data"));
     buildAndSave(DATA);
   }, [newData]);
 
 
 
-  const buildAndSave =(data) =>{
+  const buildAndSave = (data) => {
     const groups = {};
     for (let i = 0; i < data.length; ++i) {
       const currentGroup = data[i];
@@ -35,7 +36,7 @@ const Home = () => {
   }
 
   const dragEndFunction = (result) => {
-    const { destination, draggableId, source, type, } = result;
+    const { destination, source,  } = result;
     if (!destination) {
       return;
     }
@@ -66,11 +67,11 @@ const Home = () => {
     <DragDropContext
       onDragEnd={dragEndFunction}>
       <section className="w-full h-[99vh] flex items-center justify-center">
-      <ShowData/>
+        <ShowData />
         <div className="main_box w-full h-full flex items-center justify-between">
           <div className="w-6/12 h-full p-10 pt-2">
             <div className="flex items-center justify-between">
-              <h1 className="text-7xl font_z">cal</h1> <h1 className="text-7xl font_z">A</h1>
+              <h1 className="text-7xl font_z">cal</h1> <h1 className="text-3xl font_z"><Link to="sign-in">sign up</Link></h1>
             </div>
             <div className="side_Bar">
               <SideBar />
@@ -97,16 +98,15 @@ const Home = () => {
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
                                   ref={provided.innerRef}>
-                                  <div className="card_div">
+                                  <div className="card_div" 
+                                    onClick={() => {
+                                      setOpen((prev) => ({ ...prev, active: true, name: item.name, address: item.address, start: item.timeS, end: item.timeE, nbr: item.nbr, img: item.img, id: item.id }));
+                                    }}
+                                    // style={{height:`${}px`}}
+                                    >
                                     <div className='my-1 '>
-                                      <img src={item.img} alt={item.name}
-                                        className='w-[30px] h-[30px] cursor-pointer rounded-full object-cover m-auto'  
-                                         onClick={() => {
-                                          setOpen((prev)=>({...prev,active:true,name:item.name,address:item.address,start:item.timeS,end:item.timeE,nbr:item.nbr,img:item.img,id:item.id}));
-                                        }}  />
-                                     <p className='capitalize'>{item.name}</p>
+                                      <p className='capitalize'>{item.name}</p>
                                     </div>
-                                    
                                   </div>
                                 </div>
                               )}

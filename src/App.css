@@ -9,6 +9,9 @@
 .font_z {
   font-family: "Zen Dots";
 }
+.shados{
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+}
 .shado {
   box-shadow: 0px 4px 15px 0px #00000040 inset;
   min-height: calc(100% - 73px) !important;
@@ -24,6 +27,11 @@
 background-color:rgb(180 201 229);
 border-radius: 10px;
 }
+.dragging{
+background-color:rgb(180 201 229) !important;
+box-shadow: none !important;
+
+}
 .text_shadow {
   font-family: "Zen Maru Gothic";
   text-rendering: optimizeLegibility;
@@ -34,7 +42,11 @@ border-radius: 10px;
   text-shadow: 0px 3px 4px rgb(255, 255, 255, 0.8);
   -webkit-background-clip: text;
 }
-
+.time_scal_div{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 .side_Bar {
   position: absolute;
   left: -45px;
@@ -59,12 +71,14 @@ border-radius: 10px;
 .side_Bar:hover {
   left: 40px !important;
 }
-.bar_list_box .box {
+.boxshado{
+box-shadow: none !important;
+}
+.box {
   box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
-  background: rgba(255, 255, 255, 1);
-  max-width: 70px !important;
-  max-height: 70px !important;
-  min-width: 70px !important;
+  background:white;
+  width:70px;
+  height: 70px;
   border-radius: 10px;
 }
 .expended {
@@ -110,6 +124,8 @@ border-radius: 10px;
 }
 .click_box {
   cursor: pointer;
+  border-radius: 10px;
+
   transition: 0.2s all;
   box-shadow: 7px 7px 12px rgba(0, 0, 0, 0.4),
     -7px -7px 12px rgba(255, 255, 255, 0.9),
@@ -158,7 +174,7 @@ border-radius: 10px;
 }
 .card_timeline {
   border-radius: 0px 20px 20px 0px;
-  width:40px;
+  width:60px;
   display: flex;
  min-height: calc(100% - 35px);
   margin-top: 2.3rem;
@@ -169,6 +185,12 @@ border-radius: 10px;
 .hour{
   width: fit-content;
   font-size: 14px;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+.am_pm{
+  font-size: 10px !important;
 }
 .btn_card {
   box-shadow: 0px 4px 10px 0px #00000040;
@@ -230,6 +252,9 @@ border-radius: 10px;
 .form_Edit div input:focus{
   outline:solid rgb(180 201 229);
 }
+.shados:focus{
+  outline:solid rgb(180 201 229);
+}
 .display-none{
   display: none;
 }
@@ -241,7 +266,7 @@ border-radius: 10px;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border-radius: 50%;
+  /* border-radius: 50%; */
   color: black;
   box-shadow: rgb(0,0,0,0.1) 3px 3px 6px 0px inset, rgba(0,0,0, 0.1) -3px -3px 6px 1px inset;
 }
@@ -298,11 +323,6 @@ width: 49%;
     font-size: 12px ;
   }
 }
-
-
-
-
-
 
 
 
