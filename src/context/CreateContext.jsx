@@ -11,7 +11,7 @@ export const AppContextProvider = ({children})=>{
    const [cardId ,setCardId] = useState(null)
 
    const hndleDeleteAPi = (id) => {
-    let val = JSON.parse(localStorage.getItem('data'));
+    let val = JSON.parse(localStorage.getItem('datas'));
     let index = -1;
     for (let i = 0; i < val.length; i++) {
       const items = val[i].items;

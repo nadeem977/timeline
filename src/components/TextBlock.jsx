@@ -49,7 +49,10 @@ const DATABlanck = [
     id: 'af1',
     name: 'stay',
     items: [
-
+      {
+        id: 'af2', name: 'monika', address: "new york", timeS: "2024-03-31T22:20", timeE: "2024-04-02T22:20"
+        , img: "https://a.storyblok.com/f/191576/1200x800/faa88c639f/round_profil_picture_before_.webp"
+      },
     ],
     tint: 1,
   },
@@ -104,9 +107,9 @@ useEffect(()=>{
 },[droppedBoxId])
 
   useEffect(() => {
-    const existingData = localStorage.getItem("data");
+    const existingData = localStorage.getItem("datas");
     if (!existingData) {
-      localStorage.setItem("data", JSON.stringify(DATABlanck));
+      localStorage.setItem("datas", JSON.stringify(DATABlanck));
     }
   }, []);
   const handelImgeFunc = (e) => {
@@ -118,7 +121,7 @@ useEffect(()=>{
     reader.readAsDataURL(image);
   };
   const handelFunc = () => {
-    const val = JSON.parse(localStorage.getItem("data"));
+    const val = JSON.parse(localStorage.getItem("datas"));
     const newData = {
       id: uuidv4(),
       name: name,
@@ -164,7 +167,7 @@ useEffect(()=>{
       img: img
     };
   
-    const getexistingData = JSON.parse(localStorage.getItem("data"));
+    const getexistingData = JSON.parse(localStorage.getItem("datas"));
     if (getexistingData) {
       const updatedData = getexistingData.map(card => {
         if (card.items && card.items.length > 0) {

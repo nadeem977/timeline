@@ -15,15 +15,24 @@ const Home = () => {
   const [items, setItems] = useState([]);
   const [groups, setGroups] = useState({});
   const { newData, setOpen } = useContext(AppContext)
+  // const [time ,setTime] = useState(10)
+
   useEffect(() => {
     if (newData) {
-      localStorage.setItem('data', JSON.stringify(newData));
+      localStorage.setItem('datas', JSON.stringify(newData));
     }
-    const DATA = JSON.parse(localStorage.getItem("data"));
+    const DATA = JSON.parse(localStorage.getItem("datas"));
     buildAndSave(DATA);
   }, [newData]);
 
 
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     setTime(prevTime => prevTime + 1);
+  //   }, 5000);
+
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   const buildAndSave = (data) => {
     const groups = {};
@@ -60,9 +69,13 @@ const Home = () => {
       items: targetItems,
     };
     setItems(workValue);
-    localStorage.setItem('data', JSON.stringify(workValue));
+    localStorage.setItem('datas', JSON.stringify(workValue));
   }
 
+// console.log(time)
+
+
+  
   return (
     <DragDropContext
       onDragEnd={dragEndFunction}>
@@ -97,13 +110,13 @@ const Home = () => {
                                 <div
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
-                                  ref={provided.innerRef}>
+                                  ref={provided.innerRef} className='main_card_height'
+                                  // style={{height:`${time}%`}}
+                                  >
                                   <div className="card_div" 
                                     onClick={() => {
                                       setOpen((prev) => ({ ...prev, active: true, name: item.name, address: item.address, start: item.timeS, end: item.timeE, nbr: item.nbr, img: item.img, id: item.id }));
-                                    }}
-                                    // style={{height:`${}px`}}
-                                    >
+                                    }} >
                                     <div className='my-1 '>
                                       <p className='capitalize'>{item.name}</p>
                                     </div>
