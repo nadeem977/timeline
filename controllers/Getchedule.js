@@ -110,6 +110,7 @@ const getCards = async (req, res) => {
   }
 };
 const EditCards = async (req, res) => {
+  console.log(req.file);
   try {
     const oldTime = req.body.oldTime;
     const oldImg = req.body.oldImg;
@@ -125,9 +126,10 @@ const EditCards = async (req, res) => {
         await finddata.save();
         console.log("Item deleted successfully");
       }
-      if (req.file) {
+      console.log("old image", oldImg);
+      if (req.file && oldImg) {
         const oldImagePath = path.join(__dirname, "..", "public", oldImg);
-        console.log("image deleted not", oldImagePath);
+        console.log("image deleted", oldImagePath);
         if (fs.existsSync(oldImagePath)) {
           fs.unlinkSync(oldImagePath);
         }
@@ -171,16 +173,28 @@ const EditCards = async (req, res) => {
   }
 };
 const updateTableDraginng = async (req, res) => {
-  console.log(req.body) 
-  try {  
-    // const newData = await Schedule.updateOne({ time: req.body.time },{ $set: req.body });
-      //  console.log(newData)
+  try {
+    const newData = await Schedule.updateOne(
+      { time: req.body.data.time },
+      { $set: req.body.data }
+    ); 
+    if (newData.acknowledged) {
+      const findOnes = await Schedule.findOne({time: req.body.olddata.start.trim(),});
+      if (findOnes && findOnes[req.body.olddata.category.toLowerCase()]) {
+         findOnes[req.body.olddata.category.toLowerCase()] =
+         findOnes[req.body.olddata.category.toLowerCase()].filter(item => item._id.toString() !== req.body.olddata._id);
+         await findOnes.save();
+      }
+      res.status(200).send(newData);
+    } else {
+      res.status(404).send("Data not found");
+    }
   } catch (error) {
     console.error("Error updating data:", error);
     res.status(500).send("There was an internal server error");
   }
 };
-  
+
 module.exports = {
   UserSchedule,
   getCards,
