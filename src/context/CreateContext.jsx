@@ -17,6 +17,9 @@ export const AppContextProvider = ({ children }) => {
 
 
 
+  useEffect(() => {
+    GetAllData()
+  }, [])
 
   const handleClose = () => {
     setOpen((prev) => ({
@@ -32,10 +35,9 @@ export const AppContextProvider = ({ children }) => {
         category: object.category
       }
      const res = await axios.post(`${BASE_API_URL}/removeCard`, data)
-     if(res.data){
-       GetAllData()
-       handleClose()
-     }
+     GetAllData()
+     handleClose()
+     console.log("card deleted",res)
     } catch (error) {
       console.log(error)
     }
@@ -50,16 +52,6 @@ export const AppContextProvider = ({ children }) => {
       console.log(error)
     }
   }
- 
-
-
-
-  useEffect(() => {
-    GetAllData()
-  }, [])
-
-
-
 
   return (
     <AppContext.Provider

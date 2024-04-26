@@ -8,7 +8,7 @@ import { BASE_API_URL } from '../Config';
 
 const TabelCom = () => {
 
-    const { tableData, setOpen } = useContext(AppContext)
+    const { tableData, setOpen, GetAllData } = useContext(AppContext)
     const [isDraggingOver, setIsDraggingOver] = useState(false);
     const [dragData, setDragData] = useState([])
 
@@ -33,29 +33,52 @@ const TabelCom = () => {
     const handleDragLeave = () => {
         setIsDraggingOver(false);
     }
+
+
+
+
+
+
+
+
+
     const handleDrop = async (e, category, time) => {
         e.preventDefault();
         setIsDraggingOver(false);
         const droppedItem = JSON.parse(e.dataTransfer.getData('text/plain'));
+        const oldCard = { ...droppedItem };
+        const cards = droppedItem
+
+        setDragData(prevDragData => {
+            return prevDragData.map((item) => {
+                if (item.time === time) {
+                    item[category.toLowerCase()].push(cards)
+                }
+                if (item.time === oldCard.start) {
+                    item[oldCard.category.toLowerCase()] = item[oldCard.category.toLowerCase()].filter(item => item._id !== oldCard._id);
+                }
+                return item
+            })
+        });
 
         const updatedData = dragData
-        if (updatedData && droppedItem) {
-            droppedItem.start = time
-            droppedItem.category = category
+        if (updatedData && cards) {
+            cards.start = time
+            cards.category = category
             for (let i = 0; i < updatedData.length; i++) {
                 const newData = updatedData[i]
                 if (newData.time === time) {
                     try {
-                        console.log(droppedItem)
                         const data = {
-                            time:time,
-                            stay:newData.stay,
-                            do: newData.do,
-                            eat:newData.eat,
-                            other: newData.other
+                            time: time,
+                            stay: category === "stay" ? cards : newData.stay,
+                            do: category === "do" ? cards : newData.do,
+                            eat: category === "eat" ? cards : newData.eat,
+                            other: category === "other" ? cards : newData.other
                         }
-                        const res = await axios.post(`${BASE_API_URL}/DragAndDrop`,data)
-                        console.log(res)
+                        const res = await axios.post(`${BASE_API_URL}/DragAndDrop`, { data: data, olddata: oldCard })
+                        GetAllData()
+                        console.log("response", res)
                     } catch (error) {
                         console.log(error)
                     }
@@ -83,7 +106,7 @@ const TabelCom = () => {
                                 <th className='btn_card'>do</th>
                                 <th className='btn_card'>eat</th>
                                 <th className='btn_card'>other</th>
-                                <th>{" "}</th>
+                                <th className='btn_card'>timeline</th>
                             </tr>
                         </thead>
                         <tbody>
