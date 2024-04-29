@@ -329,7 +329,9 @@ input[type="datetime-local"]:focus {
 .input_divs {
   box-shadow: 0px 4px 4px 0px #00000040 inset;
 }
-
+.dragover{
+  background-color: rgba(240, 235, 235, 0.596);
+}
 @media (max-width: 1290px) {
   .font-sizes {
     font-size: 12px;
