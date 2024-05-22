@@ -1,23 +1,17 @@
 import React, { useEffect, useState } from 'react'
 
-export const TimeFormate = (time) => {
+export const TimeFormate = ({times,monthS}) => {
  
 const [timeshow , setTimeshow] = useState("")
-    
-useEffect(() => {
-
-    const newtime = new Date(time.time);
-    const month = newtime.getMonth();
+  
+useEffect(() => { 
+    const newtime = new Date(times);
     const hours = newtime.getHours();
     const minutes = newtime.getMinutes();
     const matching = `${hours === 0 ? '12' : hours >= 10 ? hours : '0' + hours}:${minutes >= 10 ? minutes : '0' + minutes}`;
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    const newdate = `${monthNames[month]} ${newtime.getDate()} ${matching}`;
+    const newdate = `${monthS} ${matching}`;
     setTimeshow(newdate);
-}, [time]);
+}, [times,monthS]);
 
   return (
     <>
@@ -27,24 +21,19 @@ useEffect(() => {
 }
 
  
-export const TimeFormateEnd = (time) => {
+export const TimeFormateEnd = ({times,monthE}) => {
  
     const [timeshow , setTimeshow] = useState("")
         
     useEffect(() => {
     
-        const newtime = new Date(time.time);
-        const month = newtime.getMonth();
+        const newtime = new Date(times);
         const hours = newtime.getHours();
         const minutes = newtime.getMinutes();
         const matching = `${hours === 0 ? '12' : hours >= 10 ? hours : '0' + hours}:${minutes >= 10 ? minutes : '0' + minutes}`;
-        const monthNames = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-        ];
-        const newdate = `${monthNames[month]} ${newtime.getDate()} ${matching}`;
+        const newdate = `${monthE} ${matching}`;
         setTimeshow(newdate);
-    }, [time]);
+    }, [times,monthE]);
     
       return (
         <>

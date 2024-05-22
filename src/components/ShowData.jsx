@@ -7,12 +7,15 @@ import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import { deepOrange } from '@mui/material/colors';
 import {TimeFormate,TimeFormateEnd} from './TimeFormate';
+import { IMAGE_URL } from '../Config';
 
 
 const ShowData = () => {
 
     const { hndleDeleteAPi, open, handleClose, setCardId } = useContext(AppContext)
  
+ 
+    
     return (
         <div>
             <Modal
@@ -28,7 +31,7 @@ const ShowData = () => {
                     </div>
                     {open.img.length <= 3 ? <Stack direction="row" spacing={2}  style={{width:'fit-content',margin:'auto'}}>
                         <Avatar sx={{ bgcolor: deepOrange[500]}}>{open.name.slice(0,1)}</Avatar>
-                    </Stack> : <img src={`http://localhost:8000/${open.img}`}  alt={`${open.name}`}
+                    </Stack> : <img src={`${IMAGE_URL}/${open.img}`}  alt={`${open.name}`}
                         className='w-[80px] rounded-full object-cover h-[80px] m-auto' />}
 
                     <div className="flex justify-between gap-5 my-5">
@@ -45,13 +48,13 @@ const ShowData = () => {
                         <div>
                             <div className='flex  gap-3'>
                                 <div>
-                                    <p>Start time</p>
-                                    <TimeFormate time={open.start}/>
+                                    <p>Start Time</p>
+                                    <TimeFormate times={open.start} monthS={open?.monthS} />
                                    
                                 </div>
                                 <div>
-                                    <p>End time</p>
-                                    <TimeFormateEnd time={open.end}/>
+                                    <p>End Time</p>
+                                    <TimeFormateEnd times={open.end} monthE={open?.monthE}/>
                                   
                                 </div>
                             </div>

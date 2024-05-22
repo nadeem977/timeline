@@ -192,6 +192,9 @@
 .am_pm {
   font-size: 10px !important;
 }
+.shados{
+  box-shadow: 0px 4px 10px 0px #00000040;
+}
 .btn_card {
   box-shadow: 0px 4px 10px 0px #00000040;
   border-radius: 20px;
@@ -216,7 +219,7 @@
 .card_div {
   text-align: center;
   background-color: rgb(0 211 33 / 43%);
-  height:45px;
+  /* height:45px; */
   text-align: center;
   display: flex;
   justify-content: center;

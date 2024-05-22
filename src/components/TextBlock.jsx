@@ -43,19 +43,23 @@ const TextBlock = () => {
     reader.readAsDataURL(image);
   }; 
   const handelFunc = async () => {
-
     try { 
       let dat = new Date(start);
       const minuts = dat.getMinutes()
       const hours = dat.getHours()
       const monthIndex = dat.getMonth();
+      let endDate = new Date(end)
+      const endmonht = endDate.getMonth();
+      const enddate = endDate.getDate();
       const date = dat.getDate();
       const monthNames = [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
       ];
       const monthName = monthNames[monthIndex];
+      const lastmonth = monthNames[endmonht]
       const formattedDate = `${monthName} ${date}`;
+      const formattedend = `${lastmonth} ${enddate}`
       const matching = `${hours === 0 ? '12:00' : hours >= 10 ?  hours+':00':'0'+hours+":00"}`
       const headers = { "Content-Type": "multipart/form-data" };
       const object = {
@@ -65,10 +69,12 @@ const TextBlock = () => {
         timeS:start,
         timeE:end,
         date:formattedDate,
+        lastDate:formattedend,
         start:matching,
         minutes:minuts,
-        category:category
-        }
+        category:category,
+        height:45,
+        }    
       const res = await axios.post(`${BASE_API_URL}/userSchedule`, object, { headers });
       console.log(res)
       GetAllData()
@@ -102,7 +108,6 @@ const TextBlock = () => {
       setEnd("")
     }
   }, [cardId])
- 
   const updateItemsByCardId = async () => {
     try { 
       let dat = new Date(start);
@@ -110,10 +115,15 @@ const TextBlock = () => {
       const hours = dat.getHours()
       const monthIndex = dat.getMonth();
       const date = dat.getDate();
+      let endDate = new Date(end)
+      const endmonht = endDate.getMonth();
+      const enddate = endDate.getDate();
       const monthNames = [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
       ];
+      const lastmonth = monthNames[endmonht]
+      const formattedend = `${lastmonth} ${enddate}`
       const monthName = monthNames[monthIndex];
       const formattedDate = `${monthName} ${date}`;
       const matching = `${hours === 0 ? '12:00' : hours >= 10 ?  hours+':00':'0'+hours+":00"}`
@@ -124,18 +134,21 @@ const TextBlock = () => {
         timeS:start,
         timeE:end,
         date:formattedDate,
+        lastDate:formattedend,
         start:matching,
+        height:cardId.height,
+        lastUpdated:cardId.lastUpdated,
+        expired:cardId.expired,
         minutes:minuts,
         category:category,
-        _id:cardId.id,
+        _id:cardId.id,  
         oldTime:cardId.time,
         oldCategory:cardId.category,
         oldImg:cardId.img,
         oldId:cardId.id
         }  
         const headers = { "Content-Type": "multipart/form-data" };
-      const res = await axios.post(`${BASE_API_URL}/UpdateData`, object,{headers});
-      console.log(res)
+        await axios.post(`${BASE_API_URL}/UpdateData`, object,{headers});
       GetAllData()
       setAddNewTodo(false);
       setImg(null);
@@ -149,8 +162,7 @@ const TextBlock = () => {
     }
    
   }
-
-
+ 
   return (
     <>
       <div className="w-full  shado rounded-[10px] h-full flex items-center justify-center">
@@ -160,7 +172,7 @@ const TextBlock = () => {
               <div>
                 <label htmlFor="profile_img" className='profile_img'> 
                 {showImg ? showImg.length > 1000 ? <img src={showImg} alt="icons"  className='w-full object-cover h-full' />
-                : <img src={`http://localhost:8000/${showImg}`}  alt="image"
+                : <img src={`${IMAGE_URL}/${showImg}`}  alt="image"
                  className='w-full object-cover h-full' /> : <span>profile</span>
                 }
                   <input type="file" name="image" accept="image/*" id='profile_img' className='display-none' onChange={handelImgeFunc} />

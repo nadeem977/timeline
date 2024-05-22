@@ -9,14 +9,14 @@ export const AppContextProvider = ({ children }) => {
 
   const [newData, setNewData] = useState(null)
   const [addNewTodo, setAddNewTodo] = useState(false)
-  const [open, setOpen] = useState({ active: false, name: "", address: "", start: "", end: "", time: "", img: "", id: "", category: '' });
+  const [open, setOpen] = useState({ active: false, name: "", address: "",
+   start: "", end: "", time: "", img: "", id: "", category: '',monthS:"" 
+   ,monthE:"",height:0,lastUpdated:0,expired:false});
   const [cardId, setCardId] = useState(null)
   const [timelines, setTimelines] = useState([])
   const [tableData, setTableData] = useState([])
-
-
-
-
+  const [monthsWithData, setMonthsWithData] = useState([]);
+  
   useEffect(() => {
     GetAllData()
   }, [])
@@ -33,11 +33,10 @@ export const AppContextProvider = ({ children }) => {
         id: object.id,
         time: object.time,
         category: object.category
-      }
-     const res = await axios.post(`${BASE_API_URL}/removeCard`, data)
+      } 
+      await axios.post(`${BASE_API_URL}/removeCard`, data)
      GetAllData()
-     handleClose()
-     console.log("card deleted",res)
+     handleClose() 
     } catch (error) {
       console.log(error)
     }
@@ -45,13 +44,37 @@ export const AppContextProvider = ({ children }) => {
   }
   const GetAllData = async () => {
     try {
-      const res = await axios.get(`${BASE_API_URL}/getallData`)
-      // console.log(res)
-      setTableData(res?.data)
+ 
+      const res = await axios.get(`${BASE_API_URL}/getallData`);
+      const data = res?.data || [];
+      setTableData(data);
+      
+      const consolidatedData = data.flatMap((item) => [
+        ...(item.stay?.filter((subItem) => subItem?.startDate) || []),
+        ...(item.do?.filter((subItem) => subItem?.startDate) || []),
+        ...(item.eat?.filter((subItem) => subItem?.startDate) || []),
+        ...(item.other?.filter((subItem) => subItem?.startDate) || []),
+      ]);
+
+      const uniqueYears = new Set();
+      const filteredData = consolidatedData.filter((item) => {
+        const year = item.startDate.slice(0, 4);
+        if (!uniqueYears.has(year)) {
+          uniqueYears.add(year);
+          return true;
+        }
+        return false;
+      });
+  
+      if (filteredData.length > 0) {
+        const monthsWithData = filteredData.map(item => new Date(item.startDate).toLocaleString('default', { month: 'long' }));
+        setMonthsWithData(monthsWithData);
+      }
     } catch (error) {
-      console.log(error)
+      console.error("Error fetching data:", error);
     }
-  }
+  };
+  
 
   return (
     <AppContext.Provider
@@ -64,6 +87,7 @@ export const AppContextProvider = ({ children }) => {
         timelines, setTimelines,
         tableData, setTableData,
         GetAllData, handleClose,
+        monthsWithData, setMonthsWithData
          
       }}
     >

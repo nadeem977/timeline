@@ -1,0 +1,4 @@
+1. end month should be active 
+2. design break after card full height 
+3. card should be shwoing all days in created schedul
+4. user only add current date in cards user can't add previuse date in cards 

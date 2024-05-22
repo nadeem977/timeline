@@ -35,8 +35,7 @@ const SideBar = () => {
     setActive(active)
   };
   const handelDragEnd = (e, active) => {
-    e.preventDefault();
-    console.log(e,"text block")
+    e.preventDefault(); 
     setActive(active)
   }
 

@@ -4,23 +4,50 @@ import arroimg from "../assets/arrows.png";
 import { AppContext } from '../context/CreateContext';
 import axios from "axios"
 import { BASE_API_URL } from '../Config';
+import { MonthName } from '../assets/data';
 
 
 const TabelCom = () => {
 
-    const { tableData, setOpen, GetAllData } = useContext(AppContext)
+ 
+    const [selectedMonth, setSelectedMonth] = useState(""); 
+    const [daysInMonth, setDaysInMonth] = useState([]);
+    const { tableData, setOpen, GetAllData, monthsWithData, } = useContext(AppContext)
     const [isDraggingOver, setIsDraggingOver] = useState("");
     const [dragData, setDragData] = useState([])
 
+
     useEffect(() => {
         setDragData(tableData)
+        
     }, [tableData])
 
+    useEffect(() => {
+        const Currentmonth = new Date().getMonth();
+        if (Currentmonth >= 0) {
+            setSelectedMonth(MonthName[Currentmonth].month);
+          const currentYear = new Date().getFullYear();
+          const date = new Date(currentYear, Currentmonth + 1, 0);
+          const numDays = date.getDate();
+          const daysInArr = [];
+          for (let i = 1; i <= numDays; i++) {
+            daysInArr.push(i);
+          }
+          setDaysInMonth(daysInArr);
+          console.log(daysInArr);
+        }
+      }, []);
+    
+ 
     const SHowDetailsFunc = (Data, item, categorys) => {
         setOpen((prev) => ({
             ...prev, active: true, name: Data.name,
             time: item.time.trim(), address: Data.address, start: Data.timeS,
-            end: Data.timeE, img: Data.img, id: Data._id, category: categorys
+            end: Data.timeE, img: Data.img, id: Data._id, category: categorys,
+            monthS: Data?.startDate,
+            monthE: Data?.lastDate,
+            height:Data?.height,
+            lastUpdated:Data?.lastUpdated,expired:Data?.expired
         }))
     }
     const handleDragStart = (event, stayItem) => {
@@ -31,8 +58,6 @@ const TabelCom = () => {
         setIsDraggingOver(true);
         setIsDraggingOver(index)
     }
-
-
     const handleDrop = async (e, category, time) => {
         e.preventDefault();
         setIsDraggingOver("");
@@ -65,16 +90,9 @@ const TabelCom = () => {
                     const newData = updatedData[i]
                     if (newData.time === time) {
                         try {
-                            const data = {
-                                time: time,
-                                stay: category === "stay" ? cards : newData.stay,
-                                do: category === "do" ? cards : newData.do,
-                                eat: category === "eat" ? cards : newData.eat,
-                                other: category === "other" ? cards : newData.other
-                            }
-                            const res = await axios.post(`${BASE_API_URL}/DragAndDrop`, { data: data, olddata: oldCard })
+                            await axios.post(`${BASE_API_URL}/DragAndDrop`, { data: cards, olddata: oldCard })
                             GetAllData()
-                            console.log("response", res)
+                            // handelsorting()
                         } catch (error) {
                             console.log(error)
                         }
@@ -83,12 +101,33 @@ const TabelCom = () => {
             }
         }
     };
-
-
-
-
-
-
+    const handleMonthChange = (e) => {
+        const mahina =e.target.value ;
+        setSelectedMonth(mahina);
+        const formattedMonth = mahina.charAt(0).toUpperCase() + mahina.slice(1).toLowerCase();
+        const currentYear = new Date().getFullYear();
+        console.log(formattedMonth)
+        const date = new Date(currentYear, new Date(Date.parse(formattedMonth + " 1, " + currentYear)).getMonth() + 1, 0);
+        const numDays = date.getDate();
+        const daysInArr = [];
+        for (let i = 1; i <= numDays; i++) {
+            daysInArr.push(i);
+        }
+        setDaysInMonth(daysInArr);
+   
+    };
+    const handleSorting = async (e) => {
+        if (e) {
+            try {
+                const data = { month: selectedMonth, day: e.target.value };
+                const response = await axios.post(`${BASE_API_URL}/sortingData`, data);
+                setDragData(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    };
+  
 
 
     return (
@@ -103,7 +142,23 @@ const TabelCom = () => {
                                 <th className='btn_card'>do</th>
                                 <th className='btn_card'>eat</th>
                                 <th className='btn_card'>other</th>
-                                <th className='btn_card'>timeline</th>
+                                <th className='p-0 w-[150px]'>
+                                    <div className='flex w-full items-center shados rounded-full overflow-hidden'>
+                                        <select value={selectedMonth} onChange={handleMonthChange} className='w-6/12 focus:outline-none shadow-none'>
+                                            {MonthName.map((item, i) => {
+                                                const isDisabled = !monthsWithData.includes(item.month);
+                                                return (
+                                                    <option key={i} className='font-[600]' value={item.month} disabled={isDisabled}>{item.month}</option>
+                                                );
+                                            })}
+                                        </select>
+                                        <select className='w-6/12 focus:outline-none shadow-none' onChange={handleSorting}>
+                                            {daysInMonth?.map((day) => (
+                                                <option key={day} value={day}>{day}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -115,7 +170,7 @@ const TabelCom = () => {
                                         {item.stay.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div'
+                                                    <div className='card_div' style={{ height: stayItem?.height }}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Stay")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
                                                         draggable>
@@ -132,7 +187,7 @@ const TabelCom = () => {
                                         {item.do.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div'
+                                                    <div className='card_div' style={{ height: stayItem?.height }}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Do")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
                                                         draggable>
@@ -150,7 +205,7 @@ const TabelCom = () => {
                                         {item.eat.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div'
+                                                    <div className='card_div' style={{ height: stayItem?.height }}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Eat")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
                                                         draggable>
@@ -168,7 +223,7 @@ const TabelCom = () => {
                                         {item.other.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div'
+                                                    <div className='card_div' style={{ height: stayItem?.height }}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Other")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
                                                         draggable >
