@@ -1,26 +1,43 @@
 const Schedule = require("../models/Schedule");
 const fs = require("fs");
 const path = require("path");
+const schedules = require('node-schedule');
+
 
 const UserSchedule = async (req, res) => {
   try {
+    const imageName = req.file ? req.file.filename : "";
+
+    const data = {
+      name: req.body.name,
+      address: req.body.address,
+      timeS: req.body.timeS,
+      timeE: req.body.timeE,
+      startDate: req.body.date,
+      lastDate: req.body.lastDate,
+      start: req.body.start,
+      minutes: req.body.minutes,
+      category: req.body.category,
+      img: imageName,
+    };
+    console.log("data objects ", data);
     const matching = await Schedule.findOne({ time: req.body.start });
     if (!matching) {
       return res.status(404).send("No matching schedule found");
     }
     let newData;
-    const imageName = req.file ? req.file.filename : "";
+
     if (req.body.category === "Stay") {
-      matching.stay.push({ ...req.body, img: imageName });
+      matching.stay.push(data);
       newData = await matching.save();
     } else if (req.body.category === "Do") {
-      matching.do.push({ ...req.body, img: imageName });
+      matching.do.push(data);
       newData = await matching.save();
     } else if (req.body.category === "Eat") {
-      matching.eat.push({ ...req.body, img: imageName });
+      matching.eat.push(data);
       newData = await matching.save();
     } else {
-      matching.other.push({ ...req.body, img: imageName });
+      matching.other.push(data);
       newData = await matching.save();
     }
     res.status(200).send(newData);
@@ -32,11 +49,10 @@ const UserSchedule = async (req, res) => {
 const DeleteSchedule = async (req, res) => {
   try {
     const finddata = await Schedule.findOne({ time: req.body.time });
-
     if (finddata) {
       let updatedData;
-      switch (req.body.category) {
-        case "Stay":
+      switch (req.body.category.toLowerCase()) {
+        case "stay":
           updatedData = finddata.stay.find(
             (item) => item._id.toString() === req.body.id
           );
@@ -44,7 +60,7 @@ const DeleteSchedule = async (req, res) => {
             (item) => item._id.toString() !== req.body.id
           );
           break;
-        case "Do":
+        case "do":
           updatedData = finddata.do.find(
             (item) => item._id.toString() === req.body.id
           );
@@ -52,7 +68,7 @@ const DeleteSchedule = async (req, res) => {
             (item) => item._id.toString() !== req.body.id
           );
           break;
-        case "Eat":
+        case "eat":
           updatedData = finddata.eat.find(
             (item) => item._id.toString() === req.body.id
           );
@@ -60,7 +76,7 @@ const DeleteSchedule = async (req, res) => {
             (item) => item._id.toString() !== req.body.id
           );
           break;
-        case "Other":
+        case "other":
           updatedData = finddata.other.find(
             (item) => item._id.toString() === req.body.id
           );
@@ -110,11 +126,11 @@ const getCards = async (req, res) => {
   }
 };
 const EditCards = async (req, res) => {
-  console.log(req.file);
   try {
     const oldTime = req.body.oldTime;
     const oldImg = req.body.oldImg;
     const oldId = req.body.oldId;
+
     const oldCategory = req.body.oldCategory.toLowerCase();
     const finddata = await Schedule.findOne({ time: oldTime });
     if (finddata && finddata[oldCategory]) {
@@ -126,7 +142,7 @@ const EditCards = async (req, res) => {
         await finddata.save();
         console.log("Item deleted successfully");
       }
-      console.log("old image", oldImg);
+
       if (req.file && oldImg) {
         const oldImagePath = path.join(__dirname, "..", "public", oldImg);
         console.log("image deleted", oldImagePath);
@@ -134,33 +150,39 @@ const EditCards = async (req, res) => {
           fs.unlinkSync(oldImagePath);
         }
       }
+      const imageName = req.file ? req.file.filename : oldImg;
       const UpdatedData = {
         name: req.body.name,
         address: req.body.address,
         timeS: req.body.timeS,
         timeE: req.body.timeE,
-        date: req.body.date,
+        startDate: req.body.date,
+        lastDate: req.body.lastDate,
         start: req.body.start,
         minutes: req.body.minutes,
         category: req.body.category,
+        height:req.body.height,
+        lastUpdated:req.body.lastUpdated,
+        expired:req.body.expired,
+        img: imageName,
       };
       const matching = await Schedule.findOne({ time: req.body.start });
       if (!matching) {
         return res.status(404).send("No matching schedule found");
       }
       let newData;
-      const imageName = req.file ? req.file.filename : oldImg;
+
       if (req.body.category === "Stay") {
-        matching.stay.push({ ...UpdatedData, img: imageName });
+        matching.stay.push(UpdatedData);
         newData = await matching.save();
       } else if (req.body.category === "Do") {
-        matching.do.push({ ...UpdatedData, img: imageName });
+        matching.do.push(UpdatedData);
         newData = await matching.save();
       } else if (req.body.category === "Eat") {
-        matching.eat.push({ ...UpdatedData, img: imageName });
+        matching.eat.push(UpdatedData);
         newData = await matching.save();
       } else {
-        matching.other.push({ ...UpdatedData, img: imageName });
+        matching.other.push(UpdatedData);
         newData = await matching.save();
       }
       res.status(200).send(newData);
@@ -172,33 +194,218 @@ const EditCards = async (req, res) => {
     return res.status(500).send("Internal server error");
   }
 };
-const updateTableDraginng = async (req, res) => {
+const updateTableDragging = async (req, res) => {
   try {
-    const newData = await Schedule.updateOne(
-      { time: req.body.data.time },
-      { $set: req.body.data }
-    ); 
-    if (newData.acknowledged) {
-      const findOnes = await Schedule.findOne({time: req.body.olddata.start.trim(),});
-      if (findOnes && findOnes[req.body.olddata.category.toLowerCase()]) {
-         findOnes[req.body.olddata.category.toLowerCase()] =
-         findOnes[req.body.olddata.category.toLowerCase()].filter(item => item._id.toString() !== req.body.olddata._id);
-         await findOnes.save();
-      }
-      res.status(200).send(newData);
-    } else {
-      res.status(404).send("Data not found");
+    console.log(req.body);
+    const newData = await Schedule.findOne({ time: req.body.data.start });
+    if (!newData) {
+      return res.status(404).send("Data not found");
     }
+    switch (req.body.data.category) {
+      case "stay":
+        newData.stay.push(req.body.data);
+        break;
+      case "do":
+        newData.do.push(req.body.data);
+        break;
+      case "eat":
+        newData.eat.push(req.body.data);
+        break;
+      case "other":
+        newData.other.push(req.body.data);
+        break;
+      default:
+        return res.status(400).send("Invalid category");
+    }
+
+    await newData.save();
+    const findOnes = await Schedule.findOne({
+      time: req.body.olddata.start.trim(),
+    });
+    if (findOnes && findOnes[req.body.olddata.category.toLowerCase()]) {
+      findOnes[req.body.olddata.category.toLowerCase()] = findOnes[
+        req.body.olddata.category.toLowerCase()
+      ].filter(
+        (item) => !item._id.equals(req.body.olddata._id || req.body.olddata.id)
+      );
+      await findOnes.save();
+    }
+    res.status(200).send(newData);
   } catch (error) {
     console.error("Error updating data:", error);
-    res.status(500).send("There was an internal server error");
+    res.status(500).send(error.message || "There was an internal server error");
   }
 };
+const handleSortingTime = async (req, res) => {
+  const matchMonth = req.body.month;
+  const matchDay = parseInt(req.body.day);
+  console.log(matchMonth,matchDay)
+  const matchYear = new Date().getFullYear();
+  const datinng = new Date(`${matchMonth} ${matchDay} ${matchYear} UTC`);
+  const matchDate = datinng.toISOString().slice(0, 10);
+  
+  try {
+    const objects = await Schedule.find({});
+
+    const formattedObjects = objects.map((obj) => {
+      const parseDate = (dateStringArray) => {
+        if (!Array.isArray(dateStringArray) || dateStringArray.length === 0) {
+          return null;
+        }
+        
+        const dateString = dateStringArray[0];
+        const [month, day] = dateString?.split(" ");
+        if (!month || !day) {
+          return null;
+        }
+        const valDate = new Date(`${month} ${parseInt(day)} ${matchYear} UTC`);
+        return valDate.toISOString().slice(0, 10);
+      };
+
+      const dostartDate = parseDate(
+        obj.do.map((item) => {
+          return item.startDate;
+        })
+      );
+      const dolastDate = parseDate(
+        obj.do.map((item) => {
+          return item.lastDate;
+        })
+      );
+      const staystartDate = parseDate(
+        obj.stay.map((item) => {
+          return item.startDate;
+        })
+      );
+      const staylastDate = parseDate(
+        obj.stay.map((item) => {
+          return item.lastDate;
+        })
+      );
+      const eatstartDate = parseDate(
+        obj.eat.map((item) => {
+          return item.startDate;
+        })
+      );
+      const eatlastDate = parseDate(
+        obj.eat.map((item) => {
+          return item.lastDate;
+        })
+      );
+      const othestartDate = parseDate(
+        obj.other.map((item) => {
+          return item.startDate;
+        })
+      );
+      const otherlastDate = parseDate(
+        obj.other.map((item) => {
+          return item.lastDate;
+        })
+      );
+
+      const isInRange = (start, end) => {
+        return start <= matchDate && end >= matchDate;
+      };
+
+      const filterItems = (items) => {
+        return items
+          .filter((item) => {
+            const val = [item.startDate];
+            const itemDate = parseDate(val);
+            return itemDate <= matchDate;
+          })
+          .map((item) => ({
+            name: item.name,
+            address: item.address,
+            img: item.img,
+            timeS: item.timeS,
+            timeE: item.timeE,
+            start: item.start,
+            startDate: item.startDate,
+            lastDate: item.lastDate,
+            category: item.category,
+            minutes: item.minutes,
+            height:item.height,
+            id: item.id,
+          }));
+      };
+
+      return {
+        id: obj.id,
+        time: obj.time,
+        stay: isInRange(staystartDate, staylastDate)
+          ? filterItems(obj.stay)
+          : [],
+        do: isInRange(dostartDate, dolastDate) ? filterItems(obj.do) : [],
+        eat: isInRange(eatstartDate, eatlastDate) ? filterItems(obj.eat) : [],
+        other: isInRange(othestartDate, otherlastDate)
+          ? filterItems(obj.other)
+          : [],
+        __v: obj.__v,
+        createdAt: obj.createdAt,
+        updatedAt: obj.updatedAt,
+      };
+    });
+
+    res.status(200).send(formattedObjects);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+
+const scheduledTask = schedules.scheduleJob('* * * * *', async () => {
+  try {
+    const data = await Schedule.find({});
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);  // One hour ago
+ 
+    console.log("run every minute=", oneHourAgo);
+
+    for (let objData of data) {
+      let isModified = false;
+ 
+      const updateItems = (items) => {
+        return items.map((item) => {
+          console.log("Last updated:", item?.lastUpdated);
+          if (new Date(item?.lastUpdated) < oneHourAgo) {
+            console.log("Item was last updated more than 60 minutes ago.", new Date(item.lastUpdated));
+            item.height += 45;
+            item.lastUpdated = new Date();
+            isModified = true;
+          }
+          return item;
+        });
+      };
+
+      // Update all categories if they exist
+      if (objData.stay) objData.stay = updateItems(objData.stay);
+      if (objData.do) objData.do = updateItems(objData.do);
+      if (objData.eat) objData.eat = updateItems(objData.eat);
+      if (objData.other) objData.other = updateItems(objData.other);
+
+      // Save the updated document if any modifications were made
+      if (isModified) {
+        await objData.save();
+      }
+    }
+
+    console.log('Task executed every minute:', new Date().toLocaleTimeString());
+  } catch (error) {
+    console.error('Error executing scheduled task:', error);
+  }
+});
+
+ 
+console.log(scheduledTask)
+
 
 module.exports = {
   UserSchedule,
   getCards,
   DeleteSchedule,
   EditCards,
-  updateTableDraginng,
+  updateTableDragging,
+  handleSortingTime,
+ 
 };
