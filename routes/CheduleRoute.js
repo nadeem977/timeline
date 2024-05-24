@@ -1,5 +1,5 @@
 const express = require('express');
-const {UserSchedule,getCards,DeleteSchedule, EditCards ,updateTableDragging,handleSortingTime } = require("../controllers/Getchedule");  
+const {UserSchedule,getCards,DeleteSchedule, EditCards ,updateTableDragging,handleSortingTime,  } = require("../controllers/Getchedule");  
 const multer = require('multer');
 const path = require("path"); 
 const Schedule = require('../models/Schedule');
@@ -349,7 +349,7 @@ router.post("/removeCard",DeleteSchedule)
 router.post("/UpdateData" ,upload.single('image'),EditCards)
 router.post("/DragAndDrop" ,updateTableDragging)
 router.post("/sortingData",handleSortingTime) 
-  
+ 
 
 
 module.exports = router;

@@ -10,20 +10,7 @@ const staySchema = new mongoose.Schema({
   startDate: String,
   lastDate: String,
   category: String,
-  minutes: String,
-  height: {
-    type: Number,
-    default: 45,
-    max: [1035, "Height cannot be more than 1035"],
-  },
-  lastUpdated: {
-    type: Date,
-    default: Date.now,
-  },
-  expired: {
-    type: Boolean,
-    default: false,
-  },
+  minutes: String, 
 });
 const doSchema = new mongoose.Schema({
   name: String,
@@ -35,22 +22,8 @@ const doSchema = new mongoose.Schema({
   startDate: String,
   lastDate: String,
   category: String,
-  minutes: String,
-  height: {
-    type: Number,
-    default: 45,
-    max: [1035, "Height cannot be more than 1035"],
-  },
-  lastUpdated: {
-    type: Date,
-    default: Date.now,
-  },
-  expired: {
-    type: Boolean,
-    default: false,
-  },
+  minutes: String, 
 });
-  
 const eatSchema = new mongoose.Schema({
   name: String,
   address: String,
@@ -61,22 +34,8 @@ const eatSchema = new mongoose.Schema({
   startDate: String,
   lastDate: String,
   category: String,
-  minutes: String,
-  height: {
-    type: Number,
-    default: 45,
-    max: [1035, "Height cannot be more than 1035"],
-  },
-  lastUpdated: {
-    type: Date,
-    default: Date.now,
-  },
-  expired: {
-    type: Boolean,
-    default: false,
-  },
+  minutes: String, 
 });
-
 const otherSchema = new mongoose.Schema({
   name: String,
   address: String,
@@ -87,23 +46,10 @@ const otherSchema = new mongoose.Schema({
   startDate: String,
   lastDate: String,
   category: String,
-  minutes: String,
-  height: {
-    type: Number,
-    default: 45,
-    max: [1035, "Height cannot be more than 1035"],
-  },
-  lastUpdated: {
-    type: Date,
-    default: Date.now,
-  },
-  expired: {
-    type: Boolean,
-    default: false,
-  },
+  minutes: String, 
 });
 
-const SchmeAuth = mongoose.Schema(
+const SchmeAuth = new mongoose.Schema(
   {
     time: {
       type: String,
@@ -116,6 +62,12 @@ const SchmeAuth = mongoose.Schema(
   { timestamps: true }
 );
 
-const Schedule = mongoose.model("Schedule", SchmeAuth);
+
+const CreatePlan = mongoose.Schema({
+  title: String,
+  plan:[SchmeAuth]
+})
+
+const Schedule = mongoose.model("Schedule", CreatePlan);
 
 module.exports = Schedule;

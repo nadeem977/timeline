@@ -355,49 +355,56 @@ const handleSortingTime = async (req, res) => {
 };
 
 
-const scheduledTask = schedules.scheduleJob('* * * * *', async () => {
-  try {
-    const data = await Schedule.find({});
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);  // One hour ago
+// const scheduledTask = schedules.scheduleJob('* * * * *', async () => {
+//   try {
+//     const data = await Schedule.find({});
+//     const oneHourAgo = new Date(Date.now() - 1 * 1 * 1000);  // One hour ago
  
-    console.log("run every minute=", oneHourAgo);
-
-    for (let objData of data) {
-      let isModified = false;
+//     console.log("run every minute=", oneHourAgo);
+  
+//     for (let objData of data) {
+//       let isModified = false;
  
-      const updateItems = (items) => {
-        return items.map((item) => {
-          console.log("Last updated:", item?.lastUpdated);
-          if (new Date(item?.lastUpdated) < oneHourAgo) {
-            console.log("Item was last updated more than 60 minutes ago.", new Date(item.lastUpdated));
-            item.height += 45;
-            item.lastUpdated = new Date();
-            isModified = true;
-          }
-          return item;
-        });
-      };
+//       const updateItems = (items) => {
+//         return items.map((item) => {
+//           console.log("Last updated:", item.lastUpdated);
+//           if (new Date(item.lastUpdated) < oneHourAgo) {
+//             console.log("Item was last updated more than 60 minutes ago.", new Date(item.lastUpdated));
+//             if(item.height === 1035){
+//               item.expired = true 
+//               isModified = true;
+//               console.log("expired")
+//             }else{
+//               item.height += 45;
+//               item.lastUpdated = new Date();
+//               isModified = true;
+//             }
+           
+//           }
+//           return item;
+//         });
+//       };
 
-      // Update all categories if they exist
-      if (objData.stay) objData.stay = updateItems(objData.stay);
-      if (objData.do) objData.do = updateItems(objData.do);
-      if (objData.eat) objData.eat = updateItems(objData.eat);
-      if (objData.other) objData.other = updateItems(objData.other);
+//       // Update all categories if they exist
+//       if (objData.stay) objData.stay = updateItems(objData.stay);
+//       if (objData.do) objData.do = updateItems(objData.do);
+//       if (objData.eat) objData.eat = updateItems(objData.eat);
+//       if (objData.other) objData.other = updateItems(objData.other);
 
-      // Save the updated document if any modifications were made
-      if (isModified) {
-        await objData.save();
-      }
-    }
+//       // Save the updated document if any modifications were made
+//       if (isModified) {
+//         await objData.save();
+//       }
+//     }
 
-    console.log('Task executed every minute:', new Date().toLocaleTimeString());
-  } catch (error) {
-    console.error('Error executing scheduled task:', error);
-  }
-});
+//     console.log('Task executed every minute:', new Date().toLocaleTimeString());
+//   } catch (error) {
+//     console.error('Error executing scheduled task:', error);
+//   }
+// });
 
  
-console.log(scheduledTask)
+// console.log(scheduledTask)
 
 
 module.exports = {
