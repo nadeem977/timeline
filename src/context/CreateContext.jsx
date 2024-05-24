@@ -16,10 +16,15 @@ export const AppContextProvider = ({ children }) => {
   const [timelines, setTimelines] = useState([])
   const [tableData, setTableData] = useState([])
   const [monthsWithData, setMonthsWithData] = useState([]);
-  
+  const [havingData , setHavingData] = useState([]) 
+  const [planData ,setPlanData] = useState([])
   useEffect(() => {
     GetAllData()
+    // const interval = setInterval(GetAllData, 60000);
+    // return () => clearInterval(interval);
   }, [])
+
+ 
 
   const handleClose = () => {
     setOpen((prev) => ({
@@ -42,39 +47,55 @@ export const AppContextProvider = ({ children }) => {
     }
 
   }
+
+
+
   const GetAllData = async () => {
     try {
- 
-      const res = await axios.get(`${BASE_API_URL}/getallData`);
-      const data = res?.data || [];
-      setTableData(data);
-      
-      const consolidatedData = data.flatMap((item) => [
-        ...(item.stay?.filter((subItem) => subItem?.startDate) || []),
-        ...(item.do?.filter((subItem) => subItem?.startDate) || []),
-        ...(item.eat?.filter((subItem) => subItem?.startDate) || []),
-        ...(item.other?.filter((subItem) => subItem?.startDate) || []),
-      ]);
+        const res = await axios.get(`${BASE_API_URL}/getallData`);
+        const data = res?.data || [];
+        setTableData(data);
+        setPlanData(data)
+        const consolidatedData = data.flatMap((item) => [
+            ...(item.stay?.filter((subItem) => subItem?.startDate || subItem?.lastDate) || []),
+            ...(item.do?.filter((subItem) => subItem?.startDate || subItem?.lastDate) || []),
+            ...(item.eat?.filter((subItem) => subItem?.startDate || subItem?.lastDate) || []),
+            ...(item.other?.filter((subItem) => subItem?.startDate || subItem?.lastDate) || []),
+        ]);
 
-      const uniqueYears = new Set();
-      const filteredData = consolidatedData.filter((item) => {
-        const year = item.startDate.slice(0, 4);
-        if (!uniqueYears.has(year)) {
-          uniqueYears.add(year);
-          return true;
+        const uniqueYears = new Set();
+        const filteredData = consolidatedData.filter((item) => {
+            const startYear = item.startDate?.slice(0, 4);
+            const endYear = item.lastDate?.slice(0, 4);
+            const includeStartDate = startYear && !uniqueYears.has(startYear);
+            const includeEndDate = endYear && !uniqueYears.has(endYear);
+
+            if (includeStartDate) {
+                uniqueYears.add(startYear);
+                return true;
+            }
+            if (includeEndDate) {
+                uniqueYears.add(endYear);
+                return true;
+            }
+            return false;
+        });
+        setHavingData(filteredData)
+
+        if (filteredData.length > 0) { 
+ 
+            const monthsWithData = filteredData.flatMap(item => {
+                const startMonth = item.startDate ? new Date(item.startDate).toLocaleString('default', { month: 'long' }) : null;
+                const endMonth = item.lastDate ? new Date(item.lastDate).toLocaleString('default', { month: 'long' }) : null;
+                return [startMonth, endMonth].filter(Boolean);
+            });
+            setMonthsWithData([...new Set(monthsWithData)]);  
         }
-        return false;
-      });
-  
-      if (filteredData.length > 0) {
-        const monthsWithData = filteredData.map(item => new Date(item.startDate).toLocaleString('default', { month: 'long' }));
-        setMonthsWithData(monthsWithData);
-      }
     } catch (error) {
-      console.error("Error fetching data:", error);
+        console.error("Error fetching data:", error);
     }
-  };
-  
+};
+
 
   return (
     <AppContext.Provider
@@ -87,8 +108,8 @@ export const AppContextProvider = ({ children }) => {
         timelines, setTimelines,
         tableData, setTableData,
         GetAllData, handleClose,
-        monthsWithData, setMonthsWithData
-         
+        monthsWithData, setMonthsWithData ,
+        planData
       }}
     >
       {children}

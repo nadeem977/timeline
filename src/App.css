@@ -192,8 +192,24 @@
 .am_pm {
   font-size: 10px !important;
 }
+.height{
+  height: calc(100vh - 110px);
+  overflow: auto;
+  width: calc(100vw - 50px);
+  margin:0 auto;
+  box-shadow: 0px 4px 15px 0px #00000040 inset;
+  border-radius: 10px;
+}
+.gridopration{
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+}
 .shados{
   box-shadow: 0px 4px 10px 0px #00000040;
+}
+.cardshados{
+  box-shadow: 0px 4px 10px 0px #00000040;
+
 }
 .btn_card {
   box-shadow: 0px 4px 10px 0px #00000040;
@@ -230,6 +246,11 @@
   cursor: pointer;
   width: 100%;
   left: 0;
+  /* background-color: white; */
+  /* border-radius: 10px; */
+  /* z-index: 10; */
+  /* box-shadow: 0px 4px 10px 0px #00000040; */
+
 }
 .main_time_data_div {
   width: 80%;
@@ -338,6 +359,9 @@ input[type="datetime-local"]:focus {
 @media (max-width: 1290px) {
   .font-sizes {
     font-size: 12px;
+  }
+  .gridopration{
+    grid-template-columns: repeat(3,1fr);
   }
 }
 

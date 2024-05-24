@@ -9,36 +9,34 @@ import { MonthName } from '../assets/data';
 
 const TabelCom = () => {
 
- 
-    const [selectedMonth, setSelectedMonth] = useState(""); 
+
+    const [selectedMonth, setSelectedMonth] = useState("");
     const [daysInMonth, setDaysInMonth] = useState([]);
     const { tableData, setOpen, GetAllData, monthsWithData, } = useContext(AppContext)
     const [isDraggingOver, setIsDraggingOver] = useState("");
     const [dragData, setDragData] = useState([])
+    const [selectedDay, setSelectedDay] = useState("")
+  
 
 
     useEffect(() => {
         setDragData(tableData)
-        
     }, [tableData])
 
     useEffect(() => {
         const Currentmonth = new Date().getMonth();
         if (Currentmonth >= 0) {
             setSelectedMonth(MonthName[Currentmonth].month);
-          const currentYear = new Date().getFullYear();
-          const date = new Date(currentYear, Currentmonth + 1, 0);
-          const numDays = date.getDate();
-          const daysInArr = [];
-          for (let i = 1; i <= numDays; i++) {
-            daysInArr.push(i);
-          }
-          setDaysInMonth(daysInArr);
-          console.log(daysInArr);
+            const currentYear = new Date().getFullYear();
+            const date = new Date(currentYear, Currentmonth + 1, 0);
+            const numDays = date.getDate();
+            const daysInArr = [];
+            for (let i = 1; i <= numDays; i++) {
+                daysInArr.push(i);
+            }
+            setDaysInMonth(daysInArr);
         }
-      }, []);
-    
- 
+    }, []);
     const SHowDetailsFunc = (Data, item, categorys) => {
         setOpen((prev) => ({
             ...prev, active: true, name: Data.name,
@@ -46,8 +44,8 @@ const TabelCom = () => {
             end: Data.timeE, img: Data.img, id: Data._id, category: categorys,
             monthS: Data?.startDate,
             monthE: Data?.lastDate,
-            height:Data?.height,
-            lastUpdated:Data?.lastUpdated,expired:Data?.expired
+            height: Data?.height,
+            lastUpdated: Data?.lastUpdated, expired: Data?.expired
         }))
     }
     const handleDragStart = (event, stayItem) => {
@@ -102,11 +100,10 @@ const TabelCom = () => {
         }
     };
     const handleMonthChange = (e) => {
-        const mahina =e.target.value ;
+        const mahina = e.target.value;
         setSelectedMonth(mahina);
         const formattedMonth = mahina.charAt(0).toUpperCase() + mahina.slice(1).toLowerCase();
         const currentYear = new Date().getFullYear();
-        console.log(formattedMonth)
         const date = new Date(currentYear, new Date(Date.parse(formattedMonth + " 1, " + currentYear)).getMonth() + 1, 0);
         const numDays = date.getDate();
         const daysInArr = [];
@@ -114,11 +111,12 @@ const TabelCom = () => {
             daysInArr.push(i);
         }
         setDaysInMonth(daysInArr);
-   
+
     };
     const handleSorting = async (e) => {
         if (e) {
             try {
+                setSelectedDay(e.target.value)
                 const data = { month: selectedMonth, day: e.target.value };
                 const response = await axios.post(`${BASE_API_URL}/sortingData`, data);
                 setDragData(response.data);
@@ -127,15 +125,47 @@ const TabelCom = () => {
             }
         }
     };
-  
 
+
+
+    const calculateTimeDifference = (startTime, endTime,) => {
+        let Hours = 0
+        const now = new Date();
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+        const addedDate = parseInt(selectedDay) || now.getDate()
+        const diffFromStart = now - start;
+        const hoursFromStart = Math.floor((diffFromStart % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        if (addedDate === start.getDate() && addedDate === now.getDate()) {
+            Hours = hoursFromStart;
+        } else if (addedDate === now.getDate()) {
+            Hours = hoursFromStart;
+        } else if (addedDate > end.getDate() || addedDate < start.getDate()) {
+            Hours = 0;
+        } else if (addedDate > start.getDate() && addedDate < now.getDate()) {
+            Hours = 24;
+        } else if (addedDate < end.getDate() && addedDate > now.getDate()) {
+            Hours = 2;
+        } else if (addedDate === end.getDate() && addedDate > now.getDate()) {
+            Hours = 2;
+        } else {
+            Hours = 24;
+        } 
+        let height = 0;
+        const increment = 45;
+        for (let i = 1; i < Hours; i++) {
+            height += increment;
+        }
+        return height;
+    };
+ 
 
     return (
         <>
 
             <div className='h-full w-6/12 mr-5 py-6 flex flex-col gap-4 pb-[2.5rem]'>
                 <div className='main_card_div heit w-full  overflow-auto'>
-                    <table className='w-full'>
+                    <table className='w-full overflow-hidden'>
                         <thead>
                             <tr>
                                 <th className='btn_card'>stay</th>
@@ -148,7 +178,8 @@ const TabelCom = () => {
                                             {MonthName.map((item, i) => {
                                                 const isDisabled = !monthsWithData.includes(item.month);
                                                 return (
-                                                    <option key={i} className='font-[600]' value={item.month} disabled={isDisabled}>{item.month}</option>
+                                                    <option key={i} className='font-[600]'
+                                                        value={item.month} disabled={isDisabled}>{item.month}</option>
                                                 );
                                             })}
                                         </select>
@@ -167,18 +198,23 @@ const TabelCom = () => {
                                     <td className={`stay_div ${isDraggingOver === i ? 'dragover' : ''}`}
                                         onDragOver={(e) => handleDragOver(e, i)}
                                         onDrop={(e) => { handleDrop(e, 'stay', item.time) }}>
-                                        {item.stay.map((stayItem, j) => (
-                                            <div key={j}>
-                                                {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div' style={{ height: stayItem?.height }}
-                                                        onClick={() => SHowDetailsFunc(stayItem, item, "Stay")}
-                                                        onDragStart={(e) => handleDragStart(e, stayItem)}
-                                                        draggable>
-                                                        {stayItem.name}
-                                                    </div>
-                                                ) : null}
-                                            </div>
-                                        ))}
+                                        {item.stay.map((stayItem, j) => {
+
+                                            return (
+                                                <div key={j}>
+                                                    {stayItem.start === item.time.trim() ? (
+                                                        <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE) || 45 }}
+                                                            onClick={() => SHowDetailsFunc(stayItem, item, "Stay")}
+                                                            onDragStart={(e) => handleDragStart(e, stayItem)}
+                                                            draggable>
+                                                              
+                                                            {stayItem.name}
+                                                        </div>
+                                                    ) : null}
+                                                </div>
+                                            )
+                                        })}
+
                                     </td>
                                     <td
                                         className={`stay_div ${isDraggingOver === i ? 'dragover' : ''}`}
@@ -187,10 +223,11 @@ const TabelCom = () => {
                                         {item.do.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div' style={{ height: stayItem?.height }}
+                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE) || 45}}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Do")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
                                                         draggable>
+                                                             
                                                         {stayItem.name}
                                                     </div>
                                                 ) : null}
@@ -205,10 +242,11 @@ const TabelCom = () => {
                                         {item.eat.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div' style={{ height: stayItem?.height }}
+                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE) || 45}}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Eat")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
                                                         draggable>
+                                                             
                                                         {stayItem.name}
                                                     </div>
                                                 ) : null}
@@ -223,10 +261,11 @@ const TabelCom = () => {
                                         {item.other.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div' style={{ height: stayItem?.height }}
+                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE)  || 45}}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Other")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
                                                         draggable >
+                                                             {console.log( calculateTimeDifference(stayItem.timeS, stayItem.timeE))}
                                                         {stayItem.name}
                                                     </div>
                                                 ) : null}

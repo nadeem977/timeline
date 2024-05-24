@@ -1,4 +1,10 @@
-1. end month should be active 
-2. design break after card full height 
-3. card should be shwoing all days in created schedul
-4. user only add current date in cards user can't add previuse date in cards 
+1. end month should be active Done
+2. design breaking after card full height  Done
+4. user only add current date in cards user can't add previuse date in cards Done
+5. how can i run card height increesing function Done
+
+
+
+3. card should be shwoing all days in created schedul in datebase then i filtered
+
+ muja height ko current date ka hisab say match karna ho gy is say muja database ma save nahi karna ho gy

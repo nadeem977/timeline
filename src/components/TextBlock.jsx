@@ -163,6 +163,16 @@ const TextBlock = () => {
    
   }
  
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero indexed
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+const currentDateTime = getCurrentDateTime();
   return (
     <>
       <div className="w-full  shado rounded-[10px] h-full flex items-center justify-center">
@@ -203,6 +213,7 @@ const TextBlock = () => {
                 <input
                   type="datetime-local"
                   id="timeData"
+                  min={currentDateTime}
                   className='start_time' value={start} onChange={(e) => setStart(e.target.value)} />
               </div>
               <div>
