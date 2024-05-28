@@ -63,7 +63,7 @@ const SchmeAuth = new mongoose.Schema(
 );
 
 
-const CreatePlan = mongoose.Schema({
+const CreatePlan = new mongoose.Schema({
   title: String,
   plan:[SchmeAuth]
 })
