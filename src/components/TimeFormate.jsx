@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react'
 export const TimeFormate = ({times,monthS}) => {
  
 const [timeshow , setTimeshow] = useState("")
-  
+ 
 useEffect(() => { 
     const newtime = new Date(times);
     const hours = newtime.getHours();
     const minutes = newtime.getMinutes();
-    const matching = `${hours === 0 ? '12' : hours >= 10 ? hours : '0' + hours}:${minutes >= 10 ? minutes : '0' + minutes}`;
+    const matching = `${hours === 0 ? '00' : hours >= 10 ? hours : '0' + hours}:${minutes >= 10 ? minutes : '0' + minutes}`;
     const newdate = `${monthS} ${matching}`;
     setTimeshow(newdate);
 }, [times,monthS]);
@@ -30,7 +30,7 @@ export const TimeFormateEnd = ({times,monthE}) => {
         const newtime = new Date(times);
         const hours = newtime.getHours();
         const minutes = newtime.getMinutes();
-        const matching = `${hours === 0 ? '12' : hours >= 10 ? hours : '0' + hours}:${minutes >= 10 ? minutes : '0' + minutes}`;
+        const matching = `${hours === 0 ? '00' : hours >= 10 ? hours : '0' + hours}:${minutes >= 10 ? minutes : '0' + minutes}`;
         const newdate = `${monthE} ${matching}`;
         setTimeshow(newdate);
     }, [times,monthE]);

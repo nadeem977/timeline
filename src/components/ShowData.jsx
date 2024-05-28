@@ -10,7 +10,7 @@ import {TimeFormate,TimeFormateEnd} from './TimeFormate';
 import { IMAGE_URL } from '../Config';
 
 
-const ShowData = () => {
+const ShowData = ({data}) => {
 
     const { hndleDeleteAPi, open, handleClose, setCardId } = useContext(AppContext)
  
@@ -61,7 +61,7 @@ const ShowData = () => {
                             <div className='flex gap-1 justify-between'>
                                 <Button variant="outlined" className='btn_Add w-fit' onClick={() => setCardId(open)}>Edit</Button>
                                 <Button variant="outlined" className='btn_Add w-fit'
-                                    onClick={() => {hndleDeleteAPi(open)}}>Delete
+                                    onClick={() => {hndleDeleteAPi(open,data._id)}}>Delete
                                 </Button>
                             </div>
                         </div>

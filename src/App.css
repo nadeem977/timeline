@@ -252,6 +252,21 @@
   /* box-shadow: 0px 4px 10px 0px #00000040; */
 
 }
+.modals{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+}
+.svgSpiner {
+  width: 20px !important; 
+  height: 20px !important; 
+  color: #6f98e6 !important;
+}
+.svgSpiner svg{
+  width: 20px;
+  height: 20px;
+}
 .main_time_data_div {
   width: 80%;
   margin: auto;

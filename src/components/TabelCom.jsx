@@ -7,21 +7,22 @@ import { BASE_API_URL } from '../Config';
 import { MonthName } from '../assets/data';
 
 
-const TabelCom = () => {
+const TabelCom = ({data}) => {
 
 
     const [selectedMonth, setSelectedMonth] = useState("");
     const [daysInMonth, setDaysInMonth] = useState([]);
-    const { tableData, setOpen, GetAllData, monthsWithData, } = useContext(AppContext)
+    const { setOpen, GetAllData, monthsWithData, } = useContext(AppContext)
     const [isDraggingOver, setIsDraggingOver] = useState("");
     const [dragData, setDragData] = useState([])
     const [selectedDay, setSelectedDay] = useState("")
-  
 
-
+ 
     useEffect(() => {
-        setDragData(tableData)
-    }, [tableData])
+        setSelectedDay(new Date().getDate())
+        setDragData(data.plan)
+    }, [data])
+ 
 
     useEffect(() => {
         const Currentmonth = new Date().getMonth();
@@ -88,9 +89,8 @@ const TabelCom = () => {
                     const newData = updatedData[i]
                     if (newData.time === time) {
                         try {
-                            await axios.post(`${BASE_API_URL}/DragAndDrop`, { data: cards, olddata: oldCard })
-                            GetAllData()
-                            // handelsorting()
+                            await axios.post(`${BASE_API_URL}/DragAndDrop`, { data: cards, olddata: oldCard,projectId:data._id })
+                            GetAllData() 
                         } catch (error) {
                             console.log(error)
                         }
@@ -111,14 +111,14 @@ const TabelCom = () => {
             daysInArr.push(i);
         }
         setDaysInMonth(daysInArr);
-
     };
     const handleSorting = async (e) => {
+        console.log(selectedMonth)
         if (e) {
             try {
                 setSelectedDay(e.target.value)
-                const data = { month: selectedMonth, day: e.target.value };
-                const response = await axios.post(`${BASE_API_URL}/sortingData`, data);
+                const datas = { month: selectedMonth, day: e.target.value,projectId:data._id };
+                const response = await axios.post(`${BASE_API_URL}/sortingData`, datas);
                 setDragData(response.data);
             } catch (error) {
                 console.log(error);
@@ -127,39 +127,23 @@ const TabelCom = () => {
     };
 
 
-
-    const calculateTimeDifference = (startTime, endTime,) => {
-        let Hours = 0
-        const now = new Date();
+   
+    const calculateTimeDifference = (startTime, endTime,category,time) => {    
         const start = new Date(startTime);
-        const end = new Date(endTime);
-        const addedDate = parseInt(selectedDay) || now.getDate()
-        const diffFromStart = now - start;
-        const hoursFromStart = Math.floor((diffFromStart % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        if (addedDate === start.getDate() && addedDate === now.getDate()) {
-            Hours = hoursFromStart;
-        } else if (addedDate === now.getDate()) {
-            Hours = hoursFromStart;
-        } else if (addedDate > end.getDate() || addedDate < start.getDate()) {
-            Hours = 0;
-        } else if (addedDate > start.getDate() && addedDate < now.getDate()) {
-            Hours = 24;
-        } else if (addedDate < end.getDate() && addedDate > now.getDate()) {
-            Hours = 2;
-        } else if (addedDate === end.getDate() && addedDate > now.getDate()) {
-            Hours = 2;
-        } else {
-            Hours = 24;
-        } 
-        let height = 0;
-        const increment = 45;
-        for (let i = 1; i < Hours; i++) {
-            height += increment;
+        const end = new Date(endTime);  
+        const currentDay = parseInt(selectedDay, 10); 
+        const diffInMs = end - start;
+        const diffInHours = Math.floor((diffInMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const endDay = end.getDate();
+        let result =24;
+        if (currentDay === endDay) {
+            result = diffInHours;
         }
+        let height = result*45;
         return height;
     };
+   
  
-
     return (
         <>
 
@@ -183,7 +167,8 @@ const TabelCom = () => {
                                                 );
                                             })}
                                         </select>
-                                        <select className='w-6/12 focus:outline-none shadow-none' onChange={handleSorting}>
+                                        <select className='w-6/12 focus:outline-none shadow-none'
+                                         onChange={handleSorting}>
                                             {daysInMonth?.map((day) => (
                                                 <option key={day} value={day}>{day}</option>
                                             ))}
@@ -193,7 +178,7 @@ const TabelCom = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {dragData.map((item, i) => (
+                            {dragData?.map((item, i) => (
                                 <tr key={i}>
                                     <td className={`stay_div ${isDraggingOver === i ? 'dragover' : ''}`}
                                         onDragOver={(e) => handleDragOver(e, i)}
@@ -203,11 +188,10 @@ const TabelCom = () => {
                                             return (
                                                 <div key={j}>
                                                     {stayItem.start === item.time.trim() ? (
-                                                        <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE) || 45 }}
+                                                        <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE,stayItem.category ,item.time)}}
                                                             onClick={() => SHowDetailsFunc(stayItem, item, "Stay")}
                                                             onDragStart={(e) => handleDragStart(e, stayItem)}
-                                                            draggable>
-                                                              
+                                                            draggable> 
                                                             {stayItem.name}
                                                         </div>
                                                     ) : null}
@@ -223,11 +207,10 @@ const TabelCom = () => {
                                         {item.do.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE) || 45}}
+                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE ,stayItem.category,item.time)}}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Do")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
-                                                        draggable>
-                                                             
+                                                        draggable> 
                                                         {stayItem.name}
                                                     </div>
                                                 ) : null}
@@ -242,11 +225,10 @@ const TabelCom = () => {
                                         {item.eat.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE) || 45}}
+                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE,stayItem.category ,item.time)}}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Eat")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
-                                                        draggable>
-                                                             
+                                                        draggable> 
                                                         {stayItem.name}
                                                     </div>
                                                 ) : null}
@@ -261,11 +243,10 @@ const TabelCom = () => {
                                         {item.other.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE)  || 45}}
+                                                    <div className='card_div' style={{ height:calculateTimeDifference(stayItem.timeS, stayItem.timeE,stayItem.category ,item.time)}}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Other")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
-                                                        draggable >
-                                                             {console.log( calculateTimeDifference(stayItem.timeS, stayItem.timeE))}
+                                                        draggable > 
                                                         {stayItem.name}
                                                     </div>
                                                 ) : null}

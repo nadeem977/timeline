@@ -4,9 +4,9 @@ import Button from '@mui/material/Button'
 import { AppContext } from '../context/CreateContext';
 import { BASE_API_URL } from '../Config';
 import axios from "axios"
+import { useParams } from 'react-router-dom';
 
-
-const TextBlock = () => {
+const TextBlock = ({data}) => {
 
   const [img, setImg] = useState(null)
   const [showImg, setShowimg] = useState(null)
@@ -17,7 +17,6 @@ const TextBlock = () => {
   const [category, setCategory] = useState("Stay")
   const { addNewTodo, setAddNewTodo, cardId, setOpen, GetAllData } = useContext(AppContext)
   const [droppedBoxId, setDroppedBoxId] = useState(null);
-
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -33,6 +32,8 @@ const TextBlock = () => {
       setDroppedBoxId(null)
     }
   }, [droppedBoxId])
+
+
   const handelImgeFunc = (e) => {
     setImg(e.target.files[0])
     const image = e.target.files[0];
@@ -41,7 +42,10 @@ const TextBlock = () => {
       setShowimg(evt.target.result);
     };
     reader.readAsDataURL(image);
-  }; 
+  };  
+  
+ 
+
   const handelFunc = async () => {
     try { 
       let dat = new Date(start);
@@ -60,7 +64,7 @@ const TextBlock = () => {
       const lastmonth = monthNames[endmonht]
       const formattedDate = `${monthName} ${date}`;
       const formattedend = `${lastmonth} ${enddate}`
-      const matching = `${hours === 0 ? '12:00' : hours >= 10 ?  hours+':00':'0'+hours+":00"}`
+      const matching = `${hours === 0 ? '00:00' : hours >= 10 ?  hours+':00':'0'+hours+":00"}`
       const headers = { "Content-Type": "multipart/form-data" };
       const object = {
         name:name,
@@ -74,6 +78,7 @@ const TextBlock = () => {
         minutes:minuts,
         category:category,
         height:45,
+        Id:data._id
         }    
       const res = await axios.post(`${BASE_API_URL}/userSchedule`, object, { headers });
       console.log(res)
@@ -145,7 +150,8 @@ const TextBlock = () => {
         oldTime:cardId.time,
         oldCategory:cardId.category,
         oldImg:cardId.img,
-        oldId:cardId.id
+        oldId:cardId.id,
+        projectId:data._id
         }  
         const headers = { "Content-Type": "multipart/form-data" };
         await axios.post(`${BASE_API_URL}/UpdateData`, object,{headers});
