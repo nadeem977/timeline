@@ -492,20 +492,19 @@ const updateTableDragging = async (req, res) => {
 }; 
 
 
-
 const handleSortingTime = async (req, res) => {
-
   
+  
+  const dates = req.body.day
   const matchDay = parseInt(req.body.day);
   const matchMonth = req.body.month;
   const matchYear = new Date().getFullYear();
   const matchDate = new Date(`${matchMonth} ${matchDay} ${matchYear} UTC`).toISOString().slice(0, 10);
-  
-
+ 
   try {
     const objects = await Schedule.findById(req.body.projectId);
 
-    const parseDate = (dateStringArray) => {
+    const parseDate = (dateStringArray) => { 
       if (!Array.isArray(dateStringArray) || dateStringArray.length === 0) { 
         return null;
       }
@@ -521,7 +520,6 @@ const handleSortingTime = async (req, res) => {
       return valDate.toISOString().slice(0, 10);
     };
     const isInRange = (start, end) => {
-      console.log( "start date",start,"selected date",matchDate)
       return start <= matchDate && end >= matchDate;
     };
 
@@ -538,7 +536,7 @@ const handleSortingTime = async (req, res) => {
           img: item.img,
           timeS: item.timeS,
           timeE: item.timeE,
-          start: item.startDate > matchDate ? "00:00" : item.start,
+          start: item.startDate.slice(4,6) === dates ?item.start:"00:00",
           startDate: item.startDate,
           lastDate: item.lastDate,
           category: item.category,
@@ -576,11 +574,9 @@ const handleSortingTime = async (req, res) => {
       const othestartDate = parseDate(obj.other.map((item) => item.startDate));
       const otherlastDate = parseDate(obj.other.map((item) => item.lastDate));
 
-      const updateItems = (items, category) => {
-        return items.map((item) => {
-          const startDate = parseDate([item.startDate]);
-          console.log("working ?",startDate,item.startDate)
-          if (startDate === matchDate) {
+      const updateItems = (items) => {
+        return items.map((item) => { 
+          if (item.startDate.slice(4,6) === dates) {
             return item;  
           } else {
             return {
@@ -590,32 +586,15 @@ const handleSortingTime = async (req, res) => {
           }
         });
       };
-      
-
+ 
       if (obj.time === "00:00") {
         return {
           id: obj.id,
           time: obj.time,
-          stay: combinedItems.stay.concat(
-            isInRange(staystartDate, staylastDate)
-              ? updateItems(filterItems(obj.stay), "stay")
-              : []
-          ),
-          do: combinedItems.do.concat(
-            isInRange(dostartDate, dolastDate)
-              ? updateItems(filterItems(obj.do), "do")
-              : []
-          ),
-          eat: combinedItems.eat.concat(
-            isInRange(eatstartDate, eatlastDate)
-              ? updateItems(filterItems(obj.eat), "eat")
-              : []
-          ),
-          other: combinedItems.other.concat(
-            isInRange(othestartDate, otherlastDate)
-              ? updateItems(filterItems(obj.other), "other")
-              : []
-          ),
+          stay: combinedItems.stay.concat(isInRange(staystartDate, staylastDate)? updateItems(filterItems(obj.stay), "stay"): []),
+          do: combinedItems.do.concat(isInRange(dostartDate, dolastDate)? updateItems(filterItems(obj.do), "do"): []),
+          eat: combinedItems.eat.concat(isInRange(eatstartDate, eatlastDate)? updateItems(filterItems(obj.eat), "eat"): []),
+          other: combinedItems.other.concat(isInRange(othestartDate, otherlastDate)? updateItems(filterItems(obj.other), "other"): []),
           __v: obj.__v,
           createdAt: obj.createdAt,
           updatedAt: obj.updatedAt,
@@ -624,10 +603,10 @@ const handleSortingTime = async (req, res) => {
         return {
           id: obj.id,
           time: obj.time,
-          stay: [],
-          do: [],
-          eat: [],
-          other: [],
+          stay: combinedItems.stay.concat(isInRange(staystartDate, staylastDate)? updateItems(filterItems(obj.stay), "stay"): []),
+          do: combinedItems.do.concat(isInRange(dostartDate, dolastDate)? updateItems(filterItems(obj.do), "do"): []),
+          eat: combinedItems.eat.concat(isInRange(eatstartDate, eatlastDate)? updateItems(filterItems(obj.eat), "eat"): []),
+          other: combinedItems.other.concat(isInRange(othestartDate, otherlastDate)? updateItems(filterItems(obj.other), "other"): []),
           __v: obj.__v,
           createdAt: obj.createdAt,
           updatedAt: obj.updatedAt,
@@ -641,6 +620,7 @@ const handleSortingTime = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 module.exports = {
   UserSchedule,

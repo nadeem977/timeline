@@ -4,22 +4,26 @@ const bcrypt = require("bcrypt");
 const addNewUser = async (req, res) => {
   try {
     const criptpass = bcrypt.hashSync(req.body.password, 5);
+    //  const findUser = User.findOne({email:req.body.email})
+    //  if(findUser){
+    //   res.status(201).send("this email a")
+    //  }
     const nnewUser = new User({
       username: req.body.username,
-      email: req.body.email,
+      email: req.body.email, 
       phone: req.body.phone,
       password: criptpass,
     });
     if (nnewUser) {
       nnewUser.save();
-      res.status(200).send(nnewUser);
+      res.status(200).send(nnewUser); 
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send(error);
-  }
+    res.status(500).send(error);   
+  } 
 };
-
+   
 const loginAuth = async (req, res) => {
   try {
     const user = await User.find({ email: req.body.email });
