@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(express.static('public'));
-dotenv.config();
+dotenv.config({path : './config/config.env'});
 app.use(compression());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true ,parameterLimit:50000}));
@@ -25,6 +25,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true ,parameterLimit:50
 
 const conectToDatabase = async () => {
     try {
+        console.log(process.env.MONGO_DB_URL)
         await mongoose.connect(process.env.MONGO_DB_URL);
         console.log("mongodb connected sucsessfuly");
     } catch (error) {
