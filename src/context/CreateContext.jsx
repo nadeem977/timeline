@@ -9,22 +9,23 @@ export const AppContextProvider = ({ children }) => {
 
   const [newData, setNewData] = useState(null)
   const [addNewTodo, setAddNewTodo] = useState(false)
-  const [open, setOpen] = useState({ active: false, name: "", address: "",
-   start: "", end: "", time: "", img: "", id: "", category: '',monthS:"" 
-   ,monthE:"",height:0,lastUpdated:0,expired:false});
+  const [open, setOpen] = useState({
+    active: false, name: "", address: "",
+    start: "", end: "", time: "", img: "", id: "", category: '', monthS: ""
+    , monthE: "", height: 0, lastUpdated: 0, expired: false
+  });
   const [cardId, setCardId] = useState(null)
   const [timelines, setTimelines] = useState([])
   const [tableData, setTableData] = useState([])
   const [monthsWithData, setMonthsWithData] = useState([]);
-  const [havingData , setHavingData] = useState([]) 
- const [planData,setPlanData] = useState([])
- 
+  const [planData, setPlanData] = useState([])
 
 
 
-useEffect(()=>{
-  GetAllData()
-},[])
+
+  useEffect(() => {
+    GetAllData()
+  }, [])
 
   const handleClose = () => {
     setOpen((prev) => ({
@@ -32,17 +33,19 @@ useEffect(()=>{
         "", end: "", img: "", id: "", time: "", category: ''
     }));
   };
-  const hndleDeleteAPi = async (object,Id) => {
+
+  
+  const hndleDeleteAPi = async (object, Id) => {
     try {
       const data = {
         id: object.id,
         time: object.time,
         category: object.category,
-        projectId:Id
-      } 
+        projectId: Id
+      }
       await axios.post(`${BASE_API_URL}/removeCard`, data)
-     GetAllData()
-     handleClose() 
+      GetAllData()
+      handleClose()
     } catch (error) {
       console.log(error)
     }
@@ -53,14 +56,14 @@ useEffect(()=>{
 
   const GetAllData = async () => {
     try {
-        const res = await axios.get(`${BASE_API_URL}/getallData`);
-        const data = res?.data || []; 
-        setTableData(data);
-        setPlanData(data)
+      const res = await axios.get(`${BASE_API_URL}/getallData`);
+      const data = res?.data || [];
+      setTableData(data);
+      setPlanData(data)
     } catch (error) {
-        console.error("Error fetching data:", error);
+      console.error("Error fetching data:", error);
     }
-};
+  };
 
 
   return (
@@ -74,7 +77,7 @@ useEffect(()=>{
         timelines, setTimelines,
         tableData, setTableData,
         GetAllData, handleClose,
-        monthsWithData, setMonthsWithData ,
+        monthsWithData, setMonthsWithData,
         planData,
       }}
     >

@@ -32,8 +32,6 @@ const TextBlock = ({data}) => {
       setDroppedBoxId(null)
     }
   }, [droppedBoxId])
-
-
   const handelImgeFunc = (e) => {
     setImg(e.target.files[0])
     const image = e.target.files[0];
@@ -43,9 +41,6 @@ const TextBlock = ({data}) => {
     };
     reader.readAsDataURL(image);
   };  
-  
- 
-
   const handelFunc = async () => {
     try { 
       let dat = new Date(start);
@@ -168,7 +163,6 @@ const TextBlock = ({data}) => {
     }
    
   }
- 
   const getCurrentDateTime = () => {
     const now = new Date();
     const year = now.getFullYear();
@@ -179,6 +173,7 @@ const TextBlock = ({data}) => {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
 const currentDateTime = getCurrentDateTime();
+
   return (
     <>
       <div className="w-full  shado rounded-[10px] h-full flex items-center justify-center">

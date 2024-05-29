@@ -113,33 +113,33 @@ const TabelCom = ({data}) => {
         setDaysInMonth(daysInArr);
     };
     const handleSorting = async (e) => {
-        console.log(selectedMonth)
         if (e) {
             try {
                 setSelectedDay(e.target.value)
                 const datas = { month: selectedMonth, day: e.target.value,projectId:data._id };
                 const response = await axios.post(`${BASE_API_URL}/sortingData`, datas);
+                // console.log(response)
                 setDragData(response.data);
             } catch (error) {
                 console.log(error);
             }
         }
     };
-
-
-   
-    const calculateTimeDifference = (startTime, endTime,category,time) => {    
+    const calculateTimeDifference = (startTime, endTime) => {    
+        let height=45;
         const start = new Date(startTime);
         const end = new Date(endTime);  
         const currentDay = parseInt(selectedDay, 10); 
-        const diffInMs = end - start;
-        const diffInHours = Math.floor((diffInMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const endDay = end.getDate();
         let result =24;
         if (currentDay === endDay) {
-            result = diffInHours;
+            result = end.getHours();
+        } 
+ 
+         let increment = 45
+         for(let i=0;i<result;i++) {
+            height += increment;
         }
-        let height = result*45;
         return height;
     };
    
@@ -188,7 +188,7 @@ const TabelCom = ({data}) => {
                                             return (
                                                 <div key={j}>
                                                     {stayItem.start === item.time.trim() ? (
-                                                        <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE,stayItem.category ,item.time)}}
+                                                        <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE)}}
                                                             onClick={() => SHowDetailsFunc(stayItem, item, "Stay")}
                                                             onDragStart={(e) => handleDragStart(e, stayItem)}
                                                             draggable> 
@@ -207,7 +207,7 @@ const TabelCom = ({data}) => {
                                         {item.do.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE ,stayItem.category,item.time)}}
+                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE)}}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Do")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
                                                         draggable> 
@@ -225,7 +225,7 @@ const TabelCom = ({data}) => {
                                         {item.eat.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE,stayItem.category ,item.time)}}
+                                                    <div className='card_div' style={{ height: calculateTimeDifference(stayItem.timeS, stayItem.timeE)}}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Eat")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
                                                         draggable> 
@@ -243,7 +243,7 @@ const TabelCom = ({data}) => {
                                         {item.other.map((stayItem, j) => (
                                             <div key={j}>
                                                 {stayItem.start === item.time.trim() ? (
-                                                    <div className='card_div' style={{ height:calculateTimeDifference(stayItem.timeS, stayItem.timeE,stayItem.category ,item.time)}}
+                                                    <div className='card_div' style={{ height:calculateTimeDifference(stayItem.timeS, stayItem.timeE)}}
                                                         onClick={() => SHowDetailsFunc(stayItem, item, "Other")}
                                                         onDragStart={(e) => handleDragStart(e, stayItem)}
                                                         draggable > 
