@@ -6,12 +6,21 @@ import { Link, useParams } from 'react-router-dom';
 import TabelCom from '../components/TabelCom';
 import { AppContext } from "../context/CreateContext"
 
+import Modal from '@mui/material/Modal';
+
 const Home = () => {
 
   const { tableData, setMonthsWithData } = useContext(AppContext)
   const [data, setData] = useState([])
   const { Id } = useParams()
+ const [user,setUser]=useState()
+ const [open, setOpen] = React.useState(false);
+  const handleClose = () => setOpen(false);
 
+useEffect(()=>{
+ const Users = localStorage.getItem("user")
+ setUser(JSON.parse(Users))
+},[])
 
   useEffect(() => {
     for (let i = 0; i < tableData?.length; i++) {
@@ -72,7 +81,7 @@ const Home = () => {
             <Link to="/"> <h1 className="text-7xl font_z">cal</h1>
             </Link>
             <h1 className='text-xl font-semibold capitalize font_z'>{data?.title?.slice(0, 12)}</h1>
-            <h1 className="text-3xl font_z"><Link to="/sign-in">sign up</Link></h1>
+            <h1 className="text-3xl font_z cursor-pointer">{user? <p onClick={()=>setOpen(true)}>{user?.username.slice(0,1)}</p>:<Link to="/sign-in">sign up</Link>}</h1>
           </div>
           <div className="side_Bar">
             <SideBar />
@@ -81,6 +90,19 @@ const Home = () => {
         </div>
         <TabelCom data={data} />
       </div>
+      <div>
+       <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description">
+        <div className='modalsShow'>
+           <h1 className='text-xl font-semibold'><span className='text-gray'>Name:</span> {user?.username}</h1>
+           <h1 className='text-xl font-semibold'><span className='text-gray'>Email:</span> {user?.email}</h1>
+           <h1 className='text-xl font-semibold'><span className='text-gray'>Phone:</span> {user?.phone}</h1>
+        </div>
+      </Modal>
+    </div>
     </section>
 
   );

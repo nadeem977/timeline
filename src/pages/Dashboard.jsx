@@ -28,6 +28,11 @@ const Dashboard = () => {
   const [title, setTitle] = useState("")
 
 
+  useEffect(()=>{
+    const Users = localStorage.getItem("user")
+    setDate(JSON.parse(Users))
+  },[])
+
   const CreatePlans = async () => {
     setApiHit(true)
     try {
@@ -76,7 +81,13 @@ const Dashboard = () => {
         <div className='flex items-center justify-between px-6 py-2 w-full '>
           <h1 className=' text-7xl font_z'>cal</h1>
           <div className='flex items-center gap-6'>
-            <Button variant="text" style={{ color: 'black', fontSize: "30px", textTransform: 'capitalize' }}>Sign out</Button>
+          {data?.username ? 
+            <Button variant="text" style={{ color: 'black', fontSize: "30px", textTransform: 'capitalize' }} 
+            onClick={()=>
+             { localStorage.removeItem("user")
+              window.location.reload()}
+            }>Sign out</Button>:
+          <Link to="/sign-in"><Button variant="text" style={{ color: 'black', fontSize: "30px", textTransform: 'capitalize' }}>Sign in</Button></Link>}
             <p className=' text-7xl font_z'>A</p></div>
         </div>
         <div className='w-full height p-5'>
@@ -89,7 +100,7 @@ const Dashboard = () => {
                       <CloseIcon />
                     </IconButton>}
                   </div>
-                <Link className='w-full h-full flex items-center justify-center' to={`/Dashboard/${item._id}`}>
+                <Link className='w-full h-full flex items-center justify-center' to={data?.username ? `/Dashboard/${item._id}` : '/sign-in'}>
                 <p className='text-1xl capitalize font-semibold '>{item.title}</p>
                 </Link>
               </div>

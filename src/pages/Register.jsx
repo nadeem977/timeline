@@ -11,10 +11,11 @@ const Register = () => {
 
 
   const [user, setUser] = useState({ name: "", email: "", password: "", phone: "" })
-  const { enqueueSnackbar } = useSnackbar();
   const[validemail,setValidemail] = useState("")
   const [validpaswords, setValidpaswords] = useState('')
+  const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate()
+
   const Regstration = async () => {
     setValidpaswords("")
     setValidemail("")
@@ -29,16 +30,15 @@ const Register = () => {
           username: user?.name, email: user?.email, password: user?.password, phone: user?.phone
         }
         const res = await axios.post(`${BASE_API_URL}/registration`, data)
-        console.log(res)
         enqueueSnackbar("User registred successfuly", { variant: 'success' });
-        // navigate('/Login');
-        // setUser((prev) => ({ ...prev, name:"",email:"",password:"",phone:"" }))
+        setUser((prev) => ({ ...prev, name:"",email:"",password:"",phone:"" }))
+        navigate('/sign-in');
       }else{
         setValidpaswords(Validpwd?.message)
       }
     } catch (error) {
       console.log(error)
-      enqueueSnackbar("User registred successfuly", { variant: 'success' });
+      enqueueSnackbar(error?.response?.data, { variant: 'error' });
     }
   }
 

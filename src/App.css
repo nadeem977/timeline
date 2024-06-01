@@ -234,8 +234,7 @@
 
 .card_div {
   text-align: center;
-  background-color: rgb(0 211 33 / 43%);
-  /* height:45px; */
+  /* background-color: rgb(0 211 33 / 43%); */
   text-align: center;
   display: flex;
   justify-content: center;
@@ -246,11 +245,6 @@
   cursor: pointer;
   width: 100%;
   left: 0;
-  /* background-color: white; */
-  /* border-radius: 10px; */
-  /* z-index: 10; */
-  /* box-shadow: 0px 4px 10px 0px #00000040; */
-
 }
 .modals{
   position:absolute;
